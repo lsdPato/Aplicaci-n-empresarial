@@ -1,0 +1,320 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  DIRECTOR
+  MEMBER
+  VIEWER
+}
+
+enum ProjectStatus {
+  ACTIVE
+  PAUSED
+  CLOSED
+}
+
+enum ExpenseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AssetType {
+  DOMAIN
+  HOSTING
+  LICENSE
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+  ONE_TIME
+}
+
+enum AssetStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum ContractType {
+  SERVICE
+  NDA
+  EMPLOYMENT
+  PARTNERSHIP
+  OTHER
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+enum ApprovalInstanceStatus {
+  PENDING
+  IN_PROGRESS
+  APPROVED
+  REJECTED
+  BLOCKED
+}
+
+enum ApprovalStepStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SKIPPED
+}
+
+// ─────────────────────────────────────────────
+// AUTH & USERS
+// ─────────────────────────────────────────────
+
+model User {
+  id        String   @id // = Supabase auth.users.id (UUID)
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  role      Role     @default(MEMBER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  permissions           Permission[]
+  projectsCreated       Project[]              @relation("ProjectCreator")
+  expensesCreated       Expense[]              @relation("ExpenseCreator")
+  expensesApproved      Expense[]              @relation("ExpenseApprover")
+  contractsCreated      Contract[]
+  approvalTemplates     ApprovalTemplate[]
+  approvalInstances     ApprovalInstance[]
+  templateStepsAssigned ApprovalTemplateStep[] @relation("StepApprover")
+  instanceStepDecisions ApprovalInstanceStep[] @relation("StepDecider")
+
+  @@map("users")
+}
+
+model Permission {
+  id         String  @id @default(cuid())
+  userId     String
+  module     String
+  canView    Boolean @default(false)
+  canCreate  Boolean @default(false)
+  canEdit    Boolean @default(false)
+  canDelete  Boolean @default(false)
+  canApprove Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, module])
+  @@map("permissions")
+}
+
+// ─────────────────────────────────────────────
+// PROJECTS
+// ─────────────────────────────────────────────
+
+model Project {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  status      ProjectStatus @default(ACTIVE)
+  budget      Decimal?      @db.Decimal(12, 2)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdById String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  createdBy         User               @relation("ProjectCreator", fields: [createdById], references: [id])
+  expenses          Expense[]
+  approvalInstances ApprovalInstance[]
+
+  @@map("projects")
+}
+
+// ─────────────────────────────────────────────
+// EXPENSES
+// ─────────────────────────────────────────────
+
+model ExpenseCategory {
+  id        String    @id @default(cuid())
+  name      String
+  color     String?
+  createdAt DateTime  @default(now())
+  expenses  Expense[]
+
+  @@map("expense_categories")
+}
+
+model Expense {
+  id           String        @id @default(cuid())
+  projectId    String
+  categoryId   String?
+  description  String
+  amount       Decimal       @db.Decimal(12, 2)
+  status       ExpenseStatus @default(PENDING)
+  date         DateTime
+  notes        String?
+  createdById  String
+  approvedById String?
+  approvedAt   DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  project    Project          @relation(fields: [projectId], references: [id])
+  category   ExpenseCategory? @relation(fields: [categoryId], references: [id])
+  createdBy  User             @relation("ExpenseCreator", fields: [createdById], references: [id])
+  approvedBy User?            @relation("ExpenseApprover", fields: [approvedById], references: [id])
+
+  @@map("expenses")
+}
+
+// ─────────────────────────────────────────────
+// DIGITAL ASSETS
+// ─────────────────────────────────────────────
+
+model DigitalAsset {
+  id             String        @id @default(cuid())
+  name           String
+  type           AssetType
+  provider       String
+  cost           Decimal?      @db.Decimal(12, 2)
+  billingCycle   BillingCycle?
+  expirationDate DateTime?
+  alertDays      Int           @default(30)
+  status         AssetStatus   @default(ACTIVE)
+  url            String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  alerts DigitalAssetAlert[]
+
+  @@map("digital_assets")
+}
+
+model DigitalAssetAlert {
+  id               String   @id @default(cuid())
+  assetId          String
+  daysBeforeExpiry Int
+  sentAt           DateTime @default(now())
+
+  asset DigitalAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([assetId, daysBeforeExpiry])
+  @@map("digital_asset_alerts")
+}
+
+// ─────────────────────────────────────────────
+// CONTRACTS / LEGAL
+// ─────────────────────────────────────────────
+
+model Contract {
+  id             String         @id @default(cuid())
+  title          String
+  counterparty   String
+  type           ContractType
+  status         ContractStatus @default(DRAFT)
+  signedDate     DateTime?
+  expirationDate DateTime?
+  value          Decimal?       @db.Decimal(12, 2)
+  fileUrl        String?
+  filePath       String?
+  notes          String?
+  createdById    String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  createdBy User @relation(fields: [createdById], references: [id])
+
+  @@map("contracts")
+}
+
+// ─────────────────────────────────────────────
+// APPROVAL FLOWS
+// ─────────────────────────────────────────────
+
+model ApprovalTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User                   @relation(fields: [createdById], references: [id])
+  steps     ApprovalTemplateStep[]
+  instances ApprovalInstance[]
+
+  @@map("approval_templates")
+}
+
+model ApprovalTemplateStep {
+  id         String  @id @default(cuid())
+  templateId String
+  order      Int
+  name       String
+  approverId String
+  required   Boolean @default(true)
+
+  template      ApprovalTemplate       @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  approver      User                   @relation("StepApprover", fields: [approverId], references: [id])
+  instanceSteps ApprovalInstanceStep[]
+
+  @@unique([templateId, order])
+  @@map("approval_template_steps")
+}
+
+model ApprovalInstance {
+  id               String                 @id @default(cuid())
+  templateId       String
+  projectId        String
+  currentStepOrder Int                    @default(1)
+  status           ApprovalInstanceStatus @default(PENDING)
+  createdById      String
+  completedAt      DateTime?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  template  ApprovalTemplate       @relation(fields: [templateId], references: [id])
+  project   Project                @relation(fields: [projectId], references: [id])
+  createdBy User                   @relation(fields: [createdById], references: [id])
+  steps     ApprovalInstanceStep[]
+
+  @@map("approval_instances")
+}
+
+model ApprovalInstanceStep {
+  id             String             @id @default(cuid())
+  instanceId     String
+  templateStepId String
+  order          Int
+  name           String
+  status         ApprovalStepStatus @default(PENDING)
+  approverId     String
+  required       Boolean            @default(true)
+  decision       String?
+  comment        String?
+  decidedAt      DateTime?
+  createdAt      DateTime           @default(now())
+
+  instance     ApprovalInstance     @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  templateStep ApprovalTemplateStep @relation(fields: [templateStepId], references: [id])
+  approver     User                 @relation("StepDecider", fields: [approverId], references: [id])
+
+  @@unique([instanceId, order])
+  @@map("approval_instance_steps")
+}
