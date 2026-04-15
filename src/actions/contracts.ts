@@ -6,7 +6,7 @@ import { z } from "zod/v4"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
 import { canAccess } from "@/lib/permissions"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import type { ActionState } from "@/types"
 
 const contractSchema = z.object({
@@ -78,7 +78,7 @@ export async function updateContractAction(_prev: ActionState, formData: FormDat
 }
 
 async function uploadContractFile(file: File): Promise<{ success: true; fileUrl: string; filePath: string } | { success: false; error: string }> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const ext = file.name.split(".").pop()
   const path = `contracts/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
@@ -101,7 +101,7 @@ export async function deleteContractAction(id: string): Promise<ActionState> {
 
   // Delete file from storage if exists
   if (contract.filePath) {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     await supabase.storage.from("legal-documents").remove([contract.filePath])
   }
 
