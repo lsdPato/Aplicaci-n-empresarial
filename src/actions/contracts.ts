@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
 import { canAccess } from "@/lib/permissions"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { toPlain } from "@/lib/utils"
 import type { ActionState } from "@/types"
 
 const contractSchema = z.object({
@@ -114,8 +115,9 @@ export async function listContracts() {
   const user = await getCurrentUser()
   if (!user || !canAccess(user, "contracts", "canView")) return []
 
-  return prisma.contract.findMany({
+  const data = await prisma.contract.findMany({
     include: { createdBy: { select: { name: true, email: true } } },
     orderBy: { createdAt: "desc" },
   })
+  return toPlain(data)
 }

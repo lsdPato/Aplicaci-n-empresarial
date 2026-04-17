@@ -6,6 +6,7 @@ import { z } from "zod/v4"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
 import { canAccess } from "@/lib/permissions"
+import { toPlain } from "@/lib/utils"
 import type { ActionState } from "@/types"
 
 const expenseSchema = z.object({
@@ -81,7 +82,7 @@ export async function listExpenses(projectId?: string, status?: string) {
   const user = await getCurrentUser()
   if (!user || !canAccess(user, "expenses", "canView")) return []
 
-  return prisma.expense.findMany({
+  const data = await prisma.expense.findMany({
     where: {
       ...(projectId ? { projectId } : {}),
       ...(status && status !== "ALL" ? { status: status as "PENDING" | "APPROVED" | "REJECTED" } : {}),
@@ -94,6 +95,7 @@ export async function listExpenses(projectId?: string, status?: string) {
     },
     orderBy: { date: "desc" },
   })
+  return toPlain(data)
 }
 
 export async function listCategories() {

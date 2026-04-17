@@ -6,6 +6,7 @@ import { z } from "zod/v4"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
 import { canAccess } from "@/lib/permissions"
+import { toPlain } from "@/lib/utils"
 import type { ActionState } from "@/types"
 
 const assetSchema = z.object({
@@ -71,5 +72,6 @@ export async function listAssets() {
   const user = await getCurrentUser()
   if (!user || !canAccess(user, "assets", "canView")) return []
 
-  return prisma.digitalAsset.findMany({ orderBy: [{ expirationDate: "asc" }, { name: "asc" }] })
+  const data = await prisma.digitalAsset.findMany({ orderBy: [{ expirationDate: "asc" }, { name: "asc" }] })
+  return toPlain(data)
 }

@@ -6,6 +6,7 @@ import { z } from "zod/v4"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/auth"
 import { canAccess } from "@/lib/permissions"
+import { toPlain } from "@/lib/utils"
 import type { ActionState } from "@/types"
 
 const projectSchema = z.object({
@@ -62,7 +63,7 @@ export async function listProjects(status?: string) {
   const user = await getCurrentUser()
   if (!user || !canAccess(user, "projects", "canView")) return []
 
-  return prisma.project.findMany({
+  const data = await prisma.project.findMany({
     where: status && status !== "ALL" ? { status: status as "ACTIVE" | "PAUSED" | "CLOSED" } : undefined,
     include: {
       createdBy: { select: { name: true, email: true } },
@@ -70,13 +71,14 @@ export async function listProjects(status?: string) {
     },
     orderBy: { createdAt: "desc" },
   })
+  return toPlain(data)
 }
 
 export async function getProject(id: string) {
   const user = await getCurrentUser()
   if (!user || !canAccess(user, "projects", "canView")) return null
 
-  return prisma.project.findUnique({
+  const data = await prisma.project.findUnique({
     where: { id },
     include: {
       createdBy: { select: { name: true, email: true } },
@@ -89,4 +91,5 @@ export async function getProject(id: string) {
       },
     },
   })
+  return toPlain(data)
 }

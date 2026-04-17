@@ -1,6 +1,14 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+// Converts Decimal and Date objects to plain JS values for Client Component serialization
+export function toPlain<T>(data: T): T {
+  return JSON.parse(JSON.stringify(data, (_, val) => {
+    if (val !== null && typeof val === "object" && val.constructor?.name === "Decimal") return val.toNumber()
+    return val
+  }))
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
