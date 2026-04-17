@@ -31,17 +31,20 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 export async function syncUserProfile(supabaseUserId: string, email: string, name?: string) {
-  return prisma.user.upsert({
-    where: { id: supabaseUserId },
-    create: {
-      id: supabaseUserId,
-      email,
-      name: name ?? email.split("@")[0],
-      role: "MEMBER",
-    },
-    update: {
-      email,
-      ...(name ? { name } : {}),
-    },
-  })
+  try {
+    return await prisma.user.upsert({
+      where: { id: supabaseUserId },
+      create: { id: supabaseUserId, email, name: name ?? email.split("@")[0], role: "MEMBER" },
+      update: { email, ...(name ? { name } : {}) },
+    })
+  } catch (err: any) {
+    if (err.code === "P2002") {
+      // Email exists with a stale ID (failed registration) — delete and recreate with correct Supabase ID
+      await prisma.user.deleteMany({ where: { email } })
+      return await prisma.user.create({
+        data: { id: supabaseUserId, email, name: name ?? email.split("@")[0], role: "MEMBER" },
+      })
+    }
+    throw err
+  }
 }
