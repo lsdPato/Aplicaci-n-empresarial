@@ -7,10 +7,21 @@ export async function getCurrentUser(): Promise<User | null> {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
-    return await prisma.user.findUnique({
+
+    let prismaUser = await prisma.user.findUnique({
       where: { id: user.id },
       include: { permissions: true },
-    }) as User | null
+    })
+
+    if (!prismaUser) {
+      await syncUserProfile(user.id, user.email!, user.user_metadata?.full_name)
+      prismaUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        include: { permissions: true },
+      })
+    }
+
+    return prismaUser as User | null
   } catch {
     return null
   }
