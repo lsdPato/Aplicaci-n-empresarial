@@ -1,12 +1,12 @@
+import { cache } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
 import type { User } from "@/generated/prisma"
 
-export async function getCurrentUser(): Promise<User | null> {
+export const getCurrentUser = cache(async (): Promise<User | null> => {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError) console.error("[getCurrentUser] Supabase auth error:", authError.message)
+    const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
 
     let prismaUser = await prisma.user.findUnique({
@@ -15,7 +15,6 @@ export async function getCurrentUser(): Promise<User | null> {
     })
 
     if (!prismaUser) {
-      console.log("[getCurrentUser] User not in Prisma, syncing...", user.id)
       await syncUserProfile(user.id, user.email!, user.user_metadata?.full_name)
       prismaUser = await prisma.user.findUnique({
         where: { id: user.id },
@@ -24,11 +23,10 @@ export async function getCurrentUser(): Promise<User | null> {
     }
 
     return prismaUser as User | null
-  } catch (err) {
-    console.error("[getCurrentUser] ERROR:", err)
+  } catch {
     return null
   }
-}
+})
 
 export async function syncUserProfile(supabaseUserId: string, email: string, name?: string) {
   try {
