@@ -28,6 +28,14 @@ export const ProjectStatus = {
 export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
 
 
+export const TransactionType = {
+  EXPENSE: 'EXPENSE',
+  INCOME: 'INCOME'
+} as const
+
+export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
+
+
 export const ExpenseStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',

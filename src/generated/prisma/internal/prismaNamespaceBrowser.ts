@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   Permission: 'Permission',
   Project: 'Project',
+  Tag: 'Tag',
   ExpenseCategory: 'ExpenseCategory',
   Expense: 'Expense',
   DigitalAsset: 'DigitalAsset',
@@ -125,6 +126,16 @@ export const ProjectScalarFieldEnum = {
 export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
 
 
+export const TagScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  color: 'color',
+  createdAt: 'createdAt'
+} as const
+
+export type TagScalarFieldEnum = (typeof TagScalarFieldEnum)[keyof typeof TagScalarFieldEnum]
+
+
 export const ExpenseCategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -141,6 +152,7 @@ export const ExpenseScalarFieldEnum = {
   categoryId: 'categoryId',
   description: 'description',
   amount: 'amount',
+  type: 'type',
   status: 'status',
   date: 'date',
   notes: 'notes',

@@ -33,6 +33,11 @@ export type Permission = Prisma.PermissionModel
  */
 export type Project = Prisma.ProjectModel
 /**
+ * Model Tag
+ * 
+ */
+export type Tag = Prisma.TagModel
+/**
  * Model ExpenseCategory
  * 
  */

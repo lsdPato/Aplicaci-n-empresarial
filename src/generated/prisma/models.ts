@@ -11,6 +11,7 @@
 export type * from './models/User'
 export type * from './models/Permission'
 export type * from './models/Project'
+export type * from './models/Tag'
 export type * from './models/ExpenseCategory'
 export type * from './models/Expense'
 export type * from './models/DigitalAsset'

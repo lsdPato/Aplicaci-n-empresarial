@@ -13,7 +13,7 @@ import { canAccess } from "@/lib/permissions"
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, module: null },
   { href: "/dashboard/projects", label: "Proyectos", icon: FolderOpen, module: "projects" as const },
-  { href: "/dashboard/expenses", label: "Gastos", icon: Receipt, module: "expenses" as const },
+  { href: "/dashboard/expenses", label: "Transacciones", icon: Receipt, module: "expenses" as const },
   { href: "/dashboard/assets", label: "Activos Digitales", icon: Monitor, module: "assets" as const },
   { href: "/dashboard/contracts", label: "Contratos", icon: FileText, module: "contracts" as const },
   { href: "/dashboard/approvals", label: "Aprobaciones", icon: GitMerge, module: "approvals" as const },
