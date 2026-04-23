@@ -1,11 +1,18 @@
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
+import { createClient } from "@/lib/supabase/server"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser()
-  if (!user) redirect("/login")
+  if (!user) {
+    // Clear the Supabase session cookie so the middleware will not bounce the
+    // user back to /dashboard on the next request (which would create a loop).
+    const supabase = await createClient()
+    await supabase.auth.signOut().catch(() => {})
+    redirect("/login")
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">

@@ -4,28 +4,46 @@ import { prisma } from "@/lib/prisma"
 import type { User } from "@/generated/prisma/client"
 
 export const getCurrentUser = cache(async (): Promise<User | null> => {
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return null
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) return null
 
+  try {
     let prismaUser = await prisma.user.findUnique({
       where: { id: user.id },
       include: { permissions: true },
     })
 
     if (!prismaUser) {
-      await syncUserProfile(user.id, user.email!, user.user_metadata?.full_name)
+      try {
+        await syncUserProfile(user.id, user.email!, user.user_metadata?.full_name)
+      } catch (syncErr) {
+        console.error("[getCurrentUser] syncUserProfile failed:", syncErr)
+      }
       prismaUser = await prisma.user.findUnique({
         where: { id: user.id },
         include: { permissions: true },
       })
     }
 
-    return prismaUser as User | null
-  } catch {
-    return null
+    if (prismaUser) return prismaUser as User
+  } catch (dbErr) {
+    console.error("[getCurrentUser] Prisma query failed:", dbErr)
   }
+
+  // Auth is valid but DB lookup failed — return a minimal user from Supabase
+  // metadata so the dashboard can still render instead of bouncing the user.
+  return {
+    id: user.id,
+    email: user.email!,
+    name: user.user_metadata?.full_name ?? user.email!.split("@")[0],
+    avatarUrl: null,
+    role: "MEMBER",
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    permissions: [],
+  } as unknown as User
 })
 
 export async function syncUserProfile(supabaseUserId: string, email: string, name?: string) {
