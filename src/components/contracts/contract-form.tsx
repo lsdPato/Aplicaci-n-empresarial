@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { createContractAction, updateContractAction } from "@/actions/contracts"
 import { formatDateInput } from "@/lib/utils"
 import type { ActionState } from "@/types"
-import type { Contract } from "@/generated/prisma"
+import type { Contract } from "@/generated/prisma/client"
 import { Upload } from "lucide-react"
 
 const initial: ActionState = { success: false }

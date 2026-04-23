@@ -1,4 +1,4 @@
-import type { Role, User } from "@/generated/prisma"
+import type { Role, User } from "@/generated/prisma/client"
 
 export type Module = "projects" | "expenses" | "assets" | "contracts" | "approvals" | "settings"
 export type PermissionAction = "canView" | "canCreate" | "canEdit" | "canDelete" | "canApprove"

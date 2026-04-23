@@ -5,4 +5,4 @@ export type ActionState<T = unknown> = {
   data?: T
 }
 
-export type { Role, ProjectStatus, ExpenseStatus, AssetType, AssetStatus, BillingCycle, ContractType, ContractStatus, ApprovalInstanceStatus, ApprovalStepStatus } from "@/generated/prisma"
+export type { Role, ProjectStatus, ExpenseStatus, AssetType, AssetStatus, BillingCycle, ContractType, ContractStatus, ApprovalInstanceStatus, ApprovalStepStatus } from "@/generated/prisma/client"

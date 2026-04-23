@@ -1,7 +1,7 @@
 import { cache } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
-import type { User } from "@/generated/prisma"
+import type { User } from "@/generated/prisma/client"
 
 export const getCurrentUser = cache(async (): Promise<User | null> => {
   try {

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { createExpenseAction } from "@/actions/expenses"
 import type { ActionState } from "@/types"
-import type { Project, ExpenseCategory } from "@/generated/prisma"
+import type { Project, ExpenseCategory } from "@/generated/prisma/client"
 
 const initial: ActionState = { success: false }
 

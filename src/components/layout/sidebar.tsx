@@ -7,7 +7,7 @@ import {
   GitMerge, Settings, Building2
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { User } from "@/generated/prisma"
+import type { User } from "@/generated/prisma/client"
 import { canAccess } from "@/lib/permissions"
 
 const navItems = [

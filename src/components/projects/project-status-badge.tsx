@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import type { ProjectStatus } from "@/generated/prisma"
+import type { ProjectStatus } from "@/generated/prisma/client"
 
 const statusConfig: Record<ProjectStatus, { label: string; variant: "success" | "warning" | "secondary" }> = {
   ACTIVE: { label: "Activo", variant: "success" },

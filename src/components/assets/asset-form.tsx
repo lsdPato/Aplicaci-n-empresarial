@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { createAssetAction, updateAssetAction } from "@/actions/assets"
 import { formatDateInput } from "@/lib/utils"
 import type { ActionState } from "@/types"
-import type { DigitalAsset } from "@/generated/prisma"
+import type { DigitalAsset } from "@/generated/prisma/client"
 
 const initial: ActionState = { success: false }
 
