@@ -54,12 +54,11 @@ export function Header({ user }: { user: User }) {
               </a>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <form action={logoutAction}>
-                <button type="submit" className="flex w-full items-center gap-2 text-destructive">
-                  <LogOut className="h-4 w-4" /> Cerrar sesión
-                </button>
-              </form>
+            <DropdownMenuItem
+              onSelect={() => logoutAction()}
+              className="flex items-center gap-2 text-destructive cursor-pointer"
+            >
+              <LogOut className="h-4 w-4" /> Cerrar sesión
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
