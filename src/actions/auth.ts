@@ -56,8 +56,12 @@ export async function registerAction(_prev: ActionState, formData: FormData): Pr
   if (error) return { success: false, error: error.message }
   if (!data.user) return { success: false, error: "No se pudo crear el usuario" }
 
-  // Sync to Prisma
-  await syncUserProfile(data.user.id, parsed.data.email, parsed.data.name)
+  // Sync to Prisma (non-fatal — user is already authenticated in Supabase)
+  try {
+    await syncUserProfile(data.user.id, parsed.data.email, parsed.data.name)
+  } catch {
+    // Will be auto-synced on first dashboard load via getCurrentUser()
+  }
 
   revalidatePath("/", "layout")
   redirect("/dashboard")

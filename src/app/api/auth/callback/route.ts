@@ -5,18 +5,24 @@ import { syncUserProfile } from "@/lib/auth"
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get("code")
-  const next = searchParams.get("next") ?? "/dashboard"
+  const nextParam = searchParams.get("next") ?? "/dashboard"
+  // Prevent open redirect: only allow relative paths
+  const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/dashboard"
 
   if (code) {
     const supabase = await createClient()
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data.user) {
-      await syncUserProfile(
-        data.user.id,
-        data.user.email!,
-        data.user.user_metadata?.full_name
-      )
+      try {
+        await syncUserProfile(
+          data.user.id,
+          data.user.email!,
+          data.user.user_metadata?.full_name
+        )
+      } catch {
+        // User is authenticated in Supabase — proceed even if Prisma sync fails
+      }
       return NextResponse.redirect(`${origin}${next}`)
     }
   }
