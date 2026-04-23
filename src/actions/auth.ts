@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
+import { redirect } from "next/navigation" // used by logoutAction
 import { z } from "zod/v4"
 import { createClient } from "@/lib/supabase/server"
 import { syncUserProfile } from "@/lib/auth"
@@ -33,7 +33,7 @@ export async function loginAction(_prev: ActionState, formData: FormData): Promi
   if (error) return { success: false, error: error.message }
 
   revalidatePath("/", "layout")
-  redirect("/dashboard")
+  return { success: true }
 }
 
 export async function registerAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -64,7 +64,7 @@ export async function registerAction(_prev: ActionState, formData: FormData): Pr
   }
 
   revalidatePath("/", "layout")
-  redirect("/dashboard")
+  return { success: true }
 }
 
 export async function logoutAction() {

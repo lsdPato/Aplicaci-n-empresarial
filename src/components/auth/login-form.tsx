@@ -1,6 +1,7 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { loginAction } from "@/actions/auth"
 import { Button } from "@/components/ui/button"
@@ -12,7 +13,12 @@ import type { ActionState } from "@/types"
 const initial: ActionState = { success: false }
 
 export function LoginForm() {
+  const router = useRouter()
   const [state, action, isPending] = useActionState(loginAction, initial)
+
+  useEffect(() => {
+    if (state.success) router.push("/dashboard")
+  }, [state.success, router])
 
   return (
     <Card>
