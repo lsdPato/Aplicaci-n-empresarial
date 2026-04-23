@@ -23,7 +23,11 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // Use getSession() in middleware to avoid a network call to Supabase on every
+  // request. getSession() validates the JWT locally; getUser() is used in
+  // Server Components/Actions where a full server-side validation is needed.
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user ?? null
 
   const pathname = request.nextUrl.pathname
   const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/api/auth")
@@ -32,13 +36,21 @@ export async function middleware(request: NextRequest) {
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
-    return NextResponse.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value)
+    })
+    return redirectResponse
   }
 
   if (user && isAuthRoute && !pathname.startsWith("/api/auth")) {
     const url = request.nextUrl.clone()
     url.pathname = "/dashboard"
-    return NextResponse.redirect(url)
+    const redirectResponse = NextResponse.redirect(url)
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value)
+    })
+    return redirectResponse
   }
 
   return supabaseResponse
