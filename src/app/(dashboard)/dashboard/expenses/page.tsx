@@ -6,8 +6,9 @@ import { listExpenses, updateExpenseStatusAction, listTags } from "@/actions/exp
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { TransactionFilters } from "@/components/expenses/transaction-filters"
+import { DeleteTransactionButton } from "@/components/expenses/delete-transaction-button"
 import { formatCurrency, formatDate } from "@/lib/utils"
-import { Plus, Tag, ArrowUpCircle, ArrowDownCircle } from "lucide-react"
+import { Plus, Tag, ArrowUpCircle, ArrowDownCircle, Pencil } from "lucide-react"
 
 const statusBadge = {
   PENDING: <Badge variant="warning">Pendiente</Badge>,
@@ -30,7 +31,10 @@ export default async function ExpensesPage({
   ])
 
   const canCreate = canAccess(user, "expenses", "canCreate")
+  const canEdit   = canAccess(user, "expenses", "canEdit")
+  const canDelete = canAccess(user, "expenses", "canDelete")
   const canApprove = canAccess(user, "expenses", "canApprove")
+  const showActions = canEdit || canDelete || canApprove
 
   const totalIncome = expenses
     .filter((e) => e.type === "INCOME")
@@ -102,7 +106,7 @@ export default async function ExpensesPage({
                 <th className="px-4 py-3 text-left font-medium">Monto</th>
                 <th className="px-4 py-3 text-left font-medium">Fecha</th>
                 <th className="px-4 py-3 text-left font-medium">Estado</th>
-                {canApprove && <th className="px-4 py-3 text-left font-medium">Acciones</th>}
+                {showActions && <th className="px-4 py-3 text-left font-medium">Acciones</th>}
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -148,22 +152,32 @@ export default async function ExpensesPage({
                   </td>
                   <td className="px-4 py-3">{formatDate(e.date)}</td>
                   <td className="px-4 py-3">{statusBadge[e.status as keyof typeof statusBadge]}</td>
-                  {canApprove && (
+                  {showActions && (
                     <td className="px-4 py-3">
-                      {e.status === "PENDING" && e.type === "EXPENSE" && (
-                        <div className="flex gap-1">
-                          <form action={async () => { "use server"; await updateExpenseStatusAction(e.id, "APPROVED") }}>
-                            <Button type="submit" size="sm" variant="outline" className="text-green-600 border-green-300 hover:bg-green-50">
-                              Aprobar
-                            </Button>
-                          </form>
-                          <form action={async () => { "use server"; await updateExpenseStatusAction(e.id, "REJECTED") }}>
-                            <Button type="submit" size="sm" variant="outline" className="text-red-600 border-red-300 hover:bg-red-50">
-                              Rechazar
-                            </Button>
-                          </form>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1">
+                        {canEdit && (
+                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0" asChild title="Editar">
+                            <Link href={`/dashboard/expenses/${e.id}/edit`}>
+                              <Pencil className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        )}
+                        {canDelete && <DeleteTransactionButton id={e.id} />}
+                        {canApprove && e.status === "PENDING" && e.type === "EXPENSE" && (
+                          <>
+                            <form action={async () => { "use server"; await updateExpenseStatusAction(e.id, "APPROVED") }}>
+                              <Button type="submit" size="sm" variant="outline" className="text-green-600 border-green-300 hover:bg-green-50">
+                                Aprobar
+                              </Button>
+                            </form>
+                            <form action={async () => { "use server"; await updateExpenseStatusAction(e.id, "REJECTED") }}>
+                              <Button type="submit" size="sm" variant="outline" className="text-red-600 border-red-300 hover:bg-red-50">
+                                Rechazar
+                              </Button>
+                            </form>
+                          </>
+                        )}
+                      </div>
                     </td>
                   )}
                 </tr>

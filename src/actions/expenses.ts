@@ -129,6 +129,51 @@ export async function deleteExpenseAction(id: string): Promise<ActionState> {
   return { success: true }
 }
 
+export async function getExpense(id: string) {
+  const user = await getCurrentUser()
+  if (!user || !canAccess(user, "expenses", "canView")) return null
+
+  const expense = await prisma.expense.findUnique({
+    where: { id },
+    include: { category: true, tags: true, project: { select: { name: true } } },
+  })
+  return expense ? toPlain(expense) : null
+}
+
+export async function updateExpenseAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const user = await getCurrentUser()
+  if (!user) return { success: false, error: "No autenticado" }
+  if (!canAccess(user, "expenses", "canEdit")) return { success: false, error: "Sin permisos" }
+
+  const id = formData.get("id") as string
+  if (!id) return { success: false, error: "ID requerido" }
+
+  const raw = Object.fromEntries(formData)
+  const tagIds = formData.getAll("tagId").filter(Boolean) as string[]
+  const parsed = expenseSchema.safeParse({ ...raw, categoryId: raw.categoryId || undefined })
+  if (!parsed.success) return { success: false, fieldErrors: z.flattenError(parsed.error).fieldErrors }
+
+  const existing = await prisma.expense.findUnique({ where: { id } })
+  if (!existing) return { success: false, error: "Transacción no encontrada" }
+
+  const isIncome = parsed.data.type === "INCOME"
+
+  await prisma.expense.update({
+    where: { id },
+    data: {
+      ...parsed.data,
+      status: isIncome ? "APPROVED" : existing.status,
+      approvedById: isIncome ? user.id : existing.approvedById,
+      approvedAt: isIncome ? (existing.approvedAt ?? new Date()) : existing.approvedAt,
+      tags: { set: tagIds.map((tagId) => ({ id: tagId })) },
+    },
+  })
+
+  revalidatePath("/dashboard/expenses")
+  revalidatePath(`/dashboard/projects/${parsed.data.projectId}`)
+  redirect("/dashboard/expenses")
+}
+
 export async function listExpenses(
   projectId?: string,
   status?: string,
