@@ -12,6 +12,8 @@ export function TransactionFilters({ tags }: { tags: Tag[] }) {
   const type = searchParams.get("type") ?? "ALL"
   const status = searchParams.get("status") ?? "ALL"
   const tagId = searchParams.get("tagId") ?? ""
+  const dateFrom = searchParams.get("dateFrom") ?? ""
+  const dateTo = searchParams.get("dateTo") ?? ""
 
   const update = useCallback(
     (key: string, value: string) => {
@@ -25,6 +27,13 @@ export function TransactionFilters({ tags }: { tags: Tag[] }) {
     },
     [router, pathname, searchParams]
   )
+
+  function clearDates() {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete("dateFrom")
+    params.delete("dateTo")
+    router.push(`${pathname}?${params.toString()}`)
+  }
 
   const btnBase = "rounded-md px-3 py-1.5 text-xs font-medium border transition-colors"
   const active = "bg-foreground text-background border-foreground"
@@ -70,6 +79,31 @@ export function TransactionFilters({ tags }: { tags: Tag[] }) {
               {opt.label}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Date range filter */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-muted-foreground">Fecha:</span>
+        <div className="flex items-center gap-1">
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => update("dateFrom", e.target.value)}
+            className="rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+          <span className="text-xs text-muted-foreground">—</span>
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => update("dateTo", e.target.value)}
+            className="rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+          />
+          {(dateFrom || dateTo) && (
+            <button onClick={clearDates} className="text-xs text-muted-foreground hover:text-foreground underline ml-1">
+              Limpiar
+            </button>
+          )}
         </div>
       </div>
 

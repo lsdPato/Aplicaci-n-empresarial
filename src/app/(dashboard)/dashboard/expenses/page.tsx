@@ -19,14 +19,14 @@ const statusBadge = {
 export default async function ExpensesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; status?: string; tagId?: string }>
+  searchParams: Promise<{ type?: string; status?: string; tagId?: string; dateFrom?: string; dateTo?: string }>
 }) {
   const user = await getCurrentUser()
   if (!user || !canAccess(user, "expenses", "canView")) redirect("/dashboard")
 
-  const { type, status, tagId } = await searchParams
+  const { type, status, tagId, dateFrom, dateTo } = await searchParams
   const [expenses, tags] = await Promise.all([
-    listExpenses(undefined, status, type, tagId),
+    listExpenses(undefined, status, type, tagId, dateFrom, dateTo),
     listTags(),
   ])
 

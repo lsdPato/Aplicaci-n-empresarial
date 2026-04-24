@@ -178,7 +178,9 @@ export async function listExpenses(
   projectId?: string,
   status?: string,
   type?: string,
-  tagId?: string
+  tagId?: string,
+  dateFrom?: string,
+  dateTo?: string
 ) {
   const user = await getCurrentUser()
   if (!user || !canAccess(user, "expenses", "canView")) return []
@@ -189,6 +191,12 @@ export async function listExpenses(
       ...(status && status !== "ALL" ? { status: status as "PENDING" | "APPROVED" | "REJECTED" } : {}),
       ...(type && type !== "ALL" ? { type: type as "EXPENSE" | "INCOME" } : {}),
       ...(tagId ? { tags: { some: { id: tagId } } } : {}),
+      ...(dateFrom || dateTo ? {
+        date: {
+          ...(dateFrom ? { gte: new Date(dateFrom) } : {}),
+          ...(dateTo ? { lte: new Date(dateTo + "T23:59:59.999Z") } : {}),
+        },
+      } : {}),
     },
     include: {
       project: { select: { name: true } },
