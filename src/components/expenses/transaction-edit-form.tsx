@@ -19,7 +19,7 @@ type Expense = {
   projectId: string
   categoryId: string | null
   description: string
-  amount: string | number
+  amount: string | number | { toNumber(): number; toString(): string }
   date: string | Date
   notes: string | null
   tags: Tag[]
