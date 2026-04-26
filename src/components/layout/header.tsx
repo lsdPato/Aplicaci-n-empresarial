@@ -1,14 +1,15 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import { logoutAction } from "@/actions/auth"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import type { User } from "@/generated/prisma/client"
-import { LogOut, User as UserIcon, ChevronDown } from "lucide-react"
+import { LogOut, User as UserIcon, ChevronDown, Sun, Moon } from "lucide-react"
 
 const roleLabel: Record<string, string> = {
   ADMIN: "Admin",
@@ -33,13 +34,16 @@ export function Header({ user }: { user: User }) {
     .slice(0, 2)
 
   const role = roleColor[user.role] ?? roleColor.VIEWER
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   return (
     <header
       className="flex h-16 items-center justify-between px-6"
       style={{
-        background: "hsl(220,48%,5%)",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        background: "hsl(var(--card))",
+        borderBottom: "1px solid hsl(var(--border))",
       }}
     >
       {/* Left — subtle brand line */}
@@ -49,13 +53,35 @@ export function Header({ user }: { user: User }) {
           background: "linear-gradient(180deg, #7c3aed, #2563eb)",
           opacity: 0.6,
         }} />
-        <span style={{ fontSize: "13px", color: "rgba(148,163,184,0.5)", letterSpacing: "0.02em" }}>
+        <span style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))", letterSpacing: "0.02em" }}>
           Panel de control
         </span>
       </div>
 
       {/* Right */}
       <div className="flex items-center gap-3">
+        {/* Theme toggle */}
+        {mounted && (
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: "32px", height: "32px", borderRadius: "8px",
+              background: "hsl(var(--accent))",
+              border: "1px solid hsl(var(--border))",
+              cursor: "pointer", color: "hsl(var(--muted-foreground))",
+              transition: "color 0.15s",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "hsl(var(--foreground))" }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "hsl(var(--muted-foreground))" }}
+          >
+            {theme === "dark"
+              ? <Sun className="h-4 w-4" />
+              : <Moon className="h-4 w-4" />
+            }
+          </button>
+        )}
+
         {/* Role badge */}
         <div style={{
           display: "inline-flex", alignItems: "center", gap: "5px",
@@ -80,51 +106,50 @@ export function Header({ user }: { user: User }) {
               className="flex items-center gap-2 rounded-full transition-opacity hover:opacity-80"
               style={{ outline: "none", background: "transparent", border: "none", cursor: "pointer" }}
             >
-              {/* Avatar with gradient ring */}
               <div style={{
                 padding: "2px", borderRadius: "50%",
                 background: "linear-gradient(135deg, #7c3aed, #2563eb, #06b6d4)",
               }}>
                 <Avatar className="h-8 w-8" style={{ display: "block" }}>
                   <AvatarImage src={user.avatarUrl ?? undefined} alt={user.name ?? user.email} />
-                  <AvatarFallback style={{ background: "hsl(220,48%,10%)", color: "#c4b5fd", fontSize: "12px", fontWeight: 600 }}>
+                  <AvatarFallback style={{ background: "hsl(var(--muted))", color: "#c4b5fd", fontSize: "12px", fontWeight: 600 }}>
                     {initials}
                   </AvatarFallback>
                 </Avatar>
               </div>
               <div className="hidden sm:block text-left">
-                <p style={{ fontSize: "13px", fontWeight: 500, color: "rgba(226,232,240,0.9)", lineHeight: 1 }}>
+                <p style={{ fontSize: "13px", fontWeight: 500, color: "hsl(var(--foreground))", lineHeight: 1 }}>
                   {user.name?.split(" ")[0] ?? user.email}
                 </p>
               </div>
-              <ChevronDown className="h-3.5 w-3.5" style={{ color: "rgba(148,163,184,0.5)" }} />
+              <ChevronDown className="h-3.5 w-3.5" style={{ color: "hsl(var(--muted-foreground))" }} />
             </button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
             align="end"
             style={{
-              background: "hsl(220,44%,7%)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
+              background: "hsl(var(--popover))",
+              border: "1px solid hsl(var(--border))",
+              boxShadow: "0 16px 40px rgba(0,0,0,0.15)",
               minWidth: "200px",
             }}
           >
             <DropdownMenuLabel>
               <div className="flex flex-col gap-0.5">
-                <p className="text-sm font-medium" style={{ color: "rgba(226,232,240,0.9)" }}>
+                <p className="text-sm font-medium" style={{ color: "hsl(var(--foreground))" }}>
                   {user.name ?? "Sin nombre"}
                 </p>
-                <p className="text-xs" style={{ color: "rgba(148,163,184,0.6)" }}>{user.email}</p>
+                <p className="text-xs" style={{ color: "hsl(var(--muted-foreground))" }}>{user.email}</p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator style={{ background: "rgba(255,255,255,0.07)" }} />
+            <DropdownMenuSeparator style={{ background: "hsl(var(--border))" }} />
             <DropdownMenuItem asChild>
               <a href="/dashboard/settings" className="flex items-center gap-2 cursor-pointer">
                 <UserIcon className="h-4 w-4" /> Perfil
               </a>
             </DropdownMenuItem>
-            <DropdownMenuSeparator style={{ background: "rgba(255,255,255,0.07)" }} />
+            <DropdownMenuSeparator style={{ background: "hsl(var(--border))" }} />
             <DropdownMenuItem
               onSelect={() => logoutAction()}
               className="flex items-center gap-2 cursor-pointer text-destructive focus:text-destructive"

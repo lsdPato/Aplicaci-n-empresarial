@@ -37,14 +37,14 @@ export function Sidebar({ user }: { user: UserWithPerms }) {
     <aside
       className="flex h-full w-64 flex-col border-r"
       style={{
-        background: "linear-gradient(180deg, hsl(220,52%,4%) 0%, hsl(220,48%,5%) 100%)",
-        borderColor: "rgba(255,255,255,0.05)",
+        background: "hsl(var(--sidebar-background))",
+        borderColor: "hsl(var(--border))",
       }}
     >
       {/* Logo */}
       <div
         className="flex h-16 items-center gap-3 px-5"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+        style={{ borderBottom: "1px solid hsl(var(--border))" }}
       >
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -55,8 +55,8 @@ export function Sidebar({ user }: { user: UserWithPerms }) {
           <Rocket className="h-4 w-4 text-white" />
         </div>
         <div>
-          <p className="text-sm font-semibold leading-none text-white">Gestión</p>
-          <p style={{ fontSize: "10px", color: "rgba(148,163,184,0.6)", marginTop: "2px" }}>Startup</p>
+          <p className="text-sm font-semibold leading-none" style={{ color: "hsl(var(--foreground))" }}>Gestión</p>
+          <p style={{ fontSize: "10px", color: "hsl(var(--muted-foreground))", marginTop: "2px" }}>Startup</p>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export function Sidebar({ user }: { user: UserWithPerms }) {
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <p style={{
           fontSize: "10px", fontWeight: 600, letterSpacing: "0.1em",
-          color: "rgba(100,116,139,0.7)", textTransform: "uppercase",
+          color: "hsl(var(--muted-foreground))", textTransform: "uppercase",
           padding: "0 8px 10px",
         }}>
           Menú
@@ -79,27 +79,26 @@ export function Sidebar({ user }: { user: UserWithPerms }) {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150"
+                  className={cn("relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150")}
                   style={isActive ? {
                     background: "linear-gradient(90deg, rgba(124,58,237,0.22) 0%, rgba(37,99,235,0.08) 100%)",
                     color: "#c4b5fd",
                   } : {
-                    color: "rgba(148,163,184,0.75)",
+                    color: "hsl(var(--sidebar-foreground))",
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.background = "rgba(255,255,255,0.05)"
-                      e.currentTarget.style.color = "rgba(226,232,240,0.9)"
+                      e.currentTarget.style.background = "hsl(var(--sidebar-accent))"
+                      e.currentTarget.style.color = "hsl(var(--foreground))"
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
                       e.currentTarget.style.background = "transparent"
-                      e.currentTarget.style.color = "rgba(148,163,184,0.75)"
+                      e.currentTarget.style.color = "hsl(var(--sidebar-foreground))"
                     }
                   }}
                 >
-                  {/* Active left indicator */}
                   {isActive && (
                     <span
                       className="absolute left-0 top-1/2 -translate-y-1/2 rounded-r-full"
@@ -123,7 +122,7 @@ export function Sidebar({ user }: { user: UserWithPerms }) {
       </nav>
 
       {/* Settings */}
-      <div className="px-3 pb-4" style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "12px", marginTop: "0" }}>
+      <div className="px-3 pb-4" style={{ borderTop: "1px solid hsl(var(--border))", paddingTop: "12px" }}>
         {(() => {
           const isActive = pathname.startsWith("/dashboard/settings")
           return (
@@ -134,18 +133,18 @@ export function Sidebar({ user }: { user: UserWithPerms }) {
                 background: "linear-gradient(90deg, rgba(124,58,237,0.22) 0%, rgba(37,99,235,0.08) 100%)",
                 color: "#c4b5fd",
               } : {
-                color: "rgba(148,163,184,0.75)",
+                color: "hsl(var(--sidebar-foreground))",
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.05)"
-                  e.currentTarget.style.color = "rgba(226,232,240,0.9)"
+                  e.currentTarget.style.background = "hsl(var(--sidebar-accent))"
+                  e.currentTarget.style.color = "hsl(var(--foreground))"
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isActive) {
                   e.currentTarget.style.background = "transparent"
-                  e.currentTarget.style.color = "rgba(148,163,184,0.75)"
+                  e.currentTarget.style.color = "hsl(var(--sidebar-foreground))"
                 }
               }}
             >

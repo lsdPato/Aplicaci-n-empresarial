@@ -31,8 +31,8 @@ export function KpiCard({ label, value, iconName, href, accent, glow, iconBg, al
       <div
         className="relative rounded-xl border p-4 cursor-pointer overflow-hidden transition-all duration-200"
         style={{
-          background: "hsl(220,44%,7%)",
-          borderColor: alert ? accent + "55" : "rgba(255,255,255,0.06)",
+          background: "hsl(var(--card))",
+          borderColor: alert ? accent + "55" : "hsl(var(--border))",
           boxShadow: alert ? `0 0 20px ${glow}` : "none",
         }}
         onMouseEnter={(e) => {
@@ -41,7 +41,7 @@ export function KpiCard({ label, value, iconName, href, accent, glow, iconBg, al
           e.currentTarget.style.transform = "translateY(-2px)"
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = alert ? accent + "55" : "rgba(255,255,255,0.06)"
+          e.currentTarget.style.borderColor = alert ? accent + "55" : "hsl(var(--border))"
           e.currentTarget.style.boxShadow = alert ? `0 0 20px ${glow}` : "none"
           e.currentTarget.style.transform = "translateY(0)"
         }}
@@ -58,7 +58,7 @@ export function KpiCard({ label, value, iconName, href, accent, glow, iconBg, al
           </div>
         </div>
 
-        <p className="text-3xl font-bold" style={{ color: alert ? accent : "rgba(226,232,240,0.95)" }}>
+        <p className="text-3xl font-bold" style={{ color: alert ? accent : "hsl(var(--foreground))" }}>
           {value}
         </p>
         {alert && value > 0 && (

@@ -2,7 +2,11 @@
 
 @layer base {
   :root {
-    /* ── Dark theme (default) ─────────────────── */
+    --radius: 0.5rem;
+  }
+
+  /* ── Dark theme ──────────────────────────────────── */
+  :root, .dark {
     --background: 220 48% 5%;
     --foreground: 210 35% 90%;
     --card: 220 44% 7%;
@@ -22,8 +26,6 @@
     --border: 217 30% 13%;
     --input: 217 30% 11%;
     --ring: 262 75% 62%;
-    --radius: 0.5rem;
-    /* ── Sidebar ─────────────────────────────── */
     --sidebar-background: 220 52% 4%;
     --sidebar-foreground: 215 14% 58%;
     --sidebar-primary: 262 75% 62%;
@@ -31,6 +33,36 @@
     --sidebar-accent: 220 44% 8%;
     --sidebar-accent-foreground: 210 30% 82%;
     --sidebar-border: 217 30% 9%;
+  }
+
+  /* ── Light theme ─────────────────────────────────── */
+  .light {
+    --background: 220 20% 97%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 262 70% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 93%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 93%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 88%;
+    --input: 220 13% 91%;
+    --ring: 262 70% 55%;
+    --sidebar-background: 220 20% 96%;
+    --sidebar-foreground: 215 14% 40%;
+    --sidebar-primary: 262 70% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 92%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 220 13% 90%;
   }
 }
 
@@ -41,7 +73,6 @@
     color: hsl(var(--foreground));
   }
 
-  /* Smooth scrollbar on dark bg */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: hsl(var(--background)); }
   ::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
