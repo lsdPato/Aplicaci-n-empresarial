@@ -4,10 +4,6 @@ import { useActionState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { registerAction } from "@/actions/auth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { ActionState } from "@/types"
 
 const initial: ActionState = { success: false }
@@ -21,50 +17,148 @@ export function RegisterForm() {
   }, [state.success, router])
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Crear cuenta</CardTitle>
-        <CardDescription>Únete a tu equipo de gestión</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form action={action} className="space-y-4">
+    <div style={{ animation: "fade-up 0.7s ease-out both" }}>
+      {/* Gradient border wrapper */}
+      <div style={{
+        position: "relative",
+        borderRadius: "20px",
+        padding: "1px",
+        background: "linear-gradient(135deg, rgba(124,58,237,0.7), rgba(37,99,235,0.5), rgba(6,182,212,0.6))",
+        boxShadow: "0 0 60px rgba(124,58,237,0.25), 0 25px 50px rgba(0,0,0,0.6)",
+        animation: "card-float 6s ease-in-out infinite",
+      }}>
+        {/* Glass card */}
+        <div style={{
+          borderRadius: "19px",
+          padding: "40px 36px",
+          background: "rgba(3,7,18,0.82)",
+          backdropFilter: "blur(28px)",
+          WebkitBackdropFilter: "blur(28px)",
+        }}>
+
+          {/* Orbit logo */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "28px" }}>
+            <div style={{ position: "relative", width: "80px", height: "80px" }}>
+              <div style={{
+                position: "absolute", inset: 0, borderRadius: "50%",
+                background: "radial-gradient(circle, rgba(124,58,237,0.5) 0%, transparent 70%)",
+                animation: "glow-pulse 2.5s ease-in-out infinite",
+              }} />
+              <div style={{
+                position: "absolute", inset: "2px", borderRadius: "50%",
+                border: "1px dashed rgba(167,139,250,0.45)",
+                animation: "orbit 12s linear infinite",
+              }}>
+                <div style={{
+                  position: "absolute", top: "-4px", left: "50%", marginLeft: "-4px",
+                  width: "8px", height: "8px", borderRadius: "50%",
+                  background: "linear-gradient(135deg,#a78bfa,#60a5fa)",
+                  boxShadow: "0 0 12px rgba(167,139,250,0.9)",
+                }} />
+              </div>
+              <div style={{
+                position: "absolute", inset: "16px", borderRadius: "50%",
+                border: "1px dashed rgba(96,165,250,0.35)",
+                animation: "orbit-rev 7s linear infinite",
+              }}>
+                <div style={{
+                  position: "absolute", bottom: "-3px", left: "50%", marginLeft: "-3px",
+                  width: "6px", height: "6px", borderRadius: "50%",
+                  background: "#60a5fa", boxShadow: "0 0 8px rgba(96,165,250,0.9)",
+                }} />
+              </div>
+              <div style={{
+                position: "absolute", inset: "26px", borderRadius: "50%",
+                background: "linear-gradient(135deg,rgba(124,58,237,0.8),rgba(37,99,235,0.8))",
+                border: "1px solid rgba(167,139,250,0.5)",
+                boxShadow: "0 0 20px rgba(124,58,237,0.6), inset 0 1px 0 rgba(255,255,255,0.1)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <span style={{ fontSize: "13px" }}>✦</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Title */}
+          <div style={{ textAlign: "center", marginBottom: "28px" }}>
+            <h1 style={{
+              margin: 0, fontSize: "24px", fontWeight: 700,
+              background: "linear-gradient(135deg, #c4b5fd 0%, #93c5fd 50%, #67e8f9 100%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>
+              Crear cuenta
+            </h1>
+            <p style={{ margin: "6px 0 0", fontSize: "13px", color: "rgba(148,163,184,0.8)" }}>
+              Únete a tu equipo de gestión
+            </p>
+          </div>
+
+          {/* Error */}
           {state.error && (
-            <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            <div style={{
+              marginBottom: "16px", padding: "10px 14px",
+              background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)",
+              borderRadius: "8px", fontSize: "13px", color: "#fca5a5",
+            }}>
               {state.error}
             </div>
           )}
-          <div className="space-y-2">
-            <Label htmlFor="name">Nombre completo</Label>
-            <Input id="name" name="name" type="text" placeholder="Juan Pérez" required />
-            {state.fieldErrors?.name && (
-              <p className="text-xs text-destructive">{state.fieldErrors.name[0]}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="tu@empresa.com" required />
-            {state.fieldErrors?.email && (
-              <p className="text-xs text-destructive">{state.fieldErrors.email[0]}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
-            <Input id="password" name="password" type="password" placeholder="Mínimo 6 caracteres" required />
-            {state.fieldErrors?.password && (
-              <p className="text-xs text-destructive">{state.fieldErrors.password[0]}</p>
-            )}
-          </div>
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Creando cuenta..." : "Crear cuenta"}
-          </Button>
-          <p className="text-center text-sm text-muted-foreground">
+
+          <form action={action} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div>
+              <label className="space-label" htmlFor="name">Nombre completo</label>
+              <input
+                id="name" name="name" type="text"
+                placeholder="Juan García" required
+                className="space-input"
+              />
+              {state.fieldErrors?.name && (
+                <p style={{ fontSize: "12px", color: "#fca5a5", marginTop: "4px" }}>
+                  {state.fieldErrors.name[0]}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="space-label" htmlFor="email">Correo electrónico</label>
+              <input
+                id="email" name="email" type="email"
+                placeholder="tu@empresa.com" required
+                className="space-input"
+              />
+              {state.fieldErrors?.email && (
+                <p style={{ fontSize: "12px", color: "#fca5a5", marginTop: "4px" }}>
+                  {state.fieldErrors.email[0]}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="space-label" htmlFor="password">Contraseña</label>
+              <input
+                id="password" name="password" type="password"
+                placeholder="Mínimo 6 caracteres" required
+                className="space-input"
+              />
+              {state.fieldErrors?.password && (
+                <p style={{ fontSize: "12px", color: "#fca5a5", marginTop: "4px" }}>
+                  {state.fieldErrors.password[0]}
+                </p>
+              )}
+            </div>
+
+            <button type="submit" disabled={isPending} className="space-btn" style={{ marginTop: "4px" }}>
+              {isPending ? "Creando cuenta…" : "Unirse al equipo"}
+            </button>
+          </form>
+
+          <p style={{ marginTop: "20px", textAlign: "center", fontSize: "13px", color: "rgba(148,163,184,0.7)" }}>
             ¿Ya tienes cuenta?{" "}
-            <Link href="/login" className="text-primary hover:underline">
-              Inicia sesión
-            </Link>
+            <Link href="/login" className="space-link">Inicia sesión</Link>
           </p>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </div>
   )
 }
