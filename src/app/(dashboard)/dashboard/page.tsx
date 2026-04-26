@@ -143,11 +143,31 @@ export default async function DashboardPage() {
     .slice(0, 8)
 
   const kpis = [
-    { label: "Proyectos activos", value: activeProjects, icon: FolderOpen, href: "/dashboard/projects", color: "text-blue-600" },
-    { label: "Gastos pendientes", value: pendingExpenses, icon: Receipt, href: "/dashboard/expenses", color: "text-yellow-600", alert: pendingExpenses > 0 },
-    { label: "Activos por vencer", value: assetsNearExpiry.length, icon: Monitor, href: "/dashboard/assets", color: "text-orange-500", alert: assetsNearExpiry.length > 0 },
-    { label: "Contratos activos", value: activeContracts, icon: FileText, href: "/dashboard/contracts", color: "text-green-600" },
-    { label: "Mis aprobaciones", value: myPendingSteps, icon: GitMerge, href: "/dashboard/approvals", color: "text-purple-600", alert: myPendingSteps > 0 },
+    {
+      label: "Proyectos activos", value: activeProjects, icon: FolderOpen,
+      href: "/dashboard/projects",
+      accent: "#2563eb", glow: "rgba(37,99,235,0.3)", iconBg: "rgba(37,99,235,0.15)",
+    },
+    {
+      label: "Gastos pendientes", value: pendingExpenses, icon: Receipt,
+      href: "/dashboard/expenses", alert: pendingExpenses > 0,
+      accent: "#d97706", glow: "rgba(217,119,6,0.3)", iconBg: "rgba(217,119,6,0.15)",
+    },
+    {
+      label: "Activos por vencer", value: assetsNearExpiry.length, icon: Monitor,
+      href: "/dashboard/assets", alert: assetsNearExpiry.length > 0,
+      accent: "#ea580c", glow: "rgba(234,88,12,0.3)", iconBg: "rgba(234,88,12,0.15)",
+    },
+    {
+      label: "Contratos activos", value: activeContracts, icon: FileText,
+      href: "/dashboard/contracts",
+      accent: "#059669", glow: "rgba(5,150,105,0.3)", iconBg: "rgba(5,150,105,0.15)",
+    },
+    {
+      label: "Mis aprobaciones", value: myPendingSteps, icon: GitMerge,
+      href: "/dashboard/approvals", alert: myPendingSteps > 0,
+      accent: "#7c3aed", glow: "rgba(124,58,237,0.3)", iconBg: "rgba(124,58,237,0.15)",
+    },
   ]
 
   const totalApprovedLast6m = monthlyChartData.reduce((s, d) => s + d.total, 0)
@@ -155,23 +175,62 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Bienvenido, {user.name?.split(" ")[0] ?? "Usuario"}</h1>
-        <p className="text-muted-foreground">Resumen de tu empresa</p>
+        <h1 className="text-2xl font-bold" style={{
+          background: "linear-gradient(135deg, #e2e8f0, #94a3b8)",
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+        }}>
+          Bienvenido, {user.name?.split(" ")[0] ?? "Usuario"}
+        </h1>
+        <p className="text-muted-foreground text-sm">Resumen operativo de tu empresa</p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {kpis.map((kpi) => (
           <Link key={kpi.label} href={kpi.href}>
-            <Card className={`hover:border-primary/50 transition-colors cursor-pointer ${kpi.alert ? "border-orange-200 bg-orange-50/40 dark:bg-orange-950/20" : ""}`}>
-              <CardHeader className="pb-2 flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-xs font-medium text-muted-foreground">{kpi.label}</CardTitle>
-                <kpi.icon className={`h-4 w-4 ${kpi.color}`} />
-              </CardHeader>
-              <CardContent>
-                <p className={`text-3xl font-bold ${kpi.alert ? "text-orange-600" : ""}`}>{kpi.value}</p>
-              </CardContent>
-            </Card>
+            <div
+              className="group relative rounded-xl border p-4 transition-all duration-200 cursor-pointer overflow-hidden"
+              style={{
+                background: "hsl(220,44%,7%)",
+                borderColor: kpi.alert ? kpi.accent + "55" : "rgba(255,255,255,0.06)",
+                boxShadow: kpi.alert ? `0 0 20px ${kpi.glow}` : "none",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = kpi.accent + "80"
+                e.currentTarget.style.boxShadow = `0 0 24px ${kpi.glow}`
+                e.currentTarget.style.transform = "translateY(-2px)"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = kpi.alert ? kpi.accent + "55" : "rgba(255,255,255,0.06)"
+                e.currentTarget.style.boxShadow = kpi.alert ? `0 0 20px ${kpi.glow}` : "none"
+                e.currentTarget.style.transform = "translateY(0)"
+              }}
+            >
+              {/* Top accent line */}
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0, height: "2px",
+                background: `linear-gradient(90deg, ${kpi.accent}, transparent)`,
+              }} />
+
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-medium text-muted-foreground leading-tight">{kpi.label}</p>
+                <div style={{
+                  padding: "6px", borderRadius: "8px",
+                  background: kpi.iconBg,
+                }}>
+                  <kpi.icon className="h-3.5 w-3.5" style={{ color: kpi.accent }} />
+                </div>
+              </div>
+
+              <p className="text-3xl font-bold" style={{ color: kpi.alert ? kpi.accent : "rgba(226,232,240,0.95)" }}>
+                {kpi.value}
+              </p>
+              {kpi.alert && kpi.value > 0 && (
+                <p className="text-xs mt-1" style={{ color: kpi.accent + "cc" }}>
+                  Requiere atención
+                </p>
+              )}
+            </div>
           </Link>
         ))}
       </div>
