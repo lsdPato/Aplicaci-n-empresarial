@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { ExpensesByMonthChart, ExpensesByCategoryChart } from "@/components/dashboard/expense-charts"
 import { BudgetProgress } from "@/components/dashboard/budget-progress"
 import { ActivityFeed } from "@/components/dashboard/activity-feed"
+import { KpiCard } from "@/components/dashboard/kpi-card"
 import { FolderOpen, Receipt, Monitor, FileText, GitMerge, AlertTriangle, Clock, TrendingUp } from "lucide-react"
 
 export default async function DashboardPage() {
@@ -187,51 +188,7 @@ export default async function DashboardPage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {kpis.map((kpi) => (
-          <Link key={kpi.label} href={kpi.href}>
-            <div
-              className="group relative rounded-xl border p-4 transition-all duration-200 cursor-pointer overflow-hidden"
-              style={{
-                background: "hsl(220,44%,7%)",
-                borderColor: kpi.alert ? kpi.accent + "55" : "rgba(255,255,255,0.06)",
-                boxShadow: kpi.alert ? `0 0 20px ${kpi.glow}` : "none",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = kpi.accent + "80"
-                e.currentTarget.style.boxShadow = `0 0 24px ${kpi.glow}`
-                e.currentTarget.style.transform = "translateY(-2px)"
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = kpi.alert ? kpi.accent + "55" : "rgba(255,255,255,0.06)"
-                e.currentTarget.style.boxShadow = kpi.alert ? `0 0 20px ${kpi.glow}` : "none"
-                e.currentTarget.style.transform = "translateY(0)"
-              }}
-            >
-              {/* Top accent line */}
-              <div style={{
-                position: "absolute", top: 0, left: 0, right: 0, height: "2px",
-                background: `linear-gradient(90deg, ${kpi.accent}, transparent)`,
-              }} />
-
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-medium text-muted-foreground leading-tight">{kpi.label}</p>
-                <div style={{
-                  padding: "6px", borderRadius: "8px",
-                  background: kpi.iconBg,
-                }}>
-                  <kpi.icon className="h-3.5 w-3.5" style={{ color: kpi.accent }} />
-                </div>
-              </div>
-
-              <p className="text-3xl font-bold" style={{ color: kpi.alert ? kpi.accent : "rgba(226,232,240,0.95)" }}>
-                {kpi.value}
-              </p>
-              {kpi.alert && kpi.value > 0 && (
-                <p className="text-xs mt-1" style={{ color: kpi.accent + "cc" }}>
-                  Requiere atención
-                </p>
-              )}
-            </div>
-          </Link>
+          <KpiCard key={kpi.label} {...kpi} />
         ))}
       </div>
 
