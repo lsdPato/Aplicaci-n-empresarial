@@ -1,12 +1,21 @@
 "use client"
 
 import Link from "next/link"
+import { FolderOpen, Receipt, Monitor, FileText, GitMerge } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+
+const ICONS: Record<string, LucideIcon> = {
+  "folder-open": FolderOpen,
+  "receipt": Receipt,
+  "monitor": Monitor,
+  "file-text": FileText,
+  "git-merge": GitMerge,
+}
 
 type KpiCardProps = {
   label: string
   value: number
-  icon: LucideIcon
+  iconName: string
   href: string
   accent: string
   glow: string
@@ -14,11 +23,13 @@ type KpiCardProps = {
   alert?: boolean
 }
 
-export function KpiCard({ label, value, icon: Icon, href, accent, glow, iconBg, alert }: KpiCardProps) {
+export function KpiCard({ label, value, iconName, href, accent, glow, iconBg, alert }: KpiCardProps) {
+  const Icon = ICONS[iconName] ?? FolderOpen
+
   return (
     <Link href={href}>
       <div
-        className="group relative rounded-xl border p-4 cursor-pointer overflow-hidden transition-all duration-200"
+        className="relative rounded-xl border p-4 cursor-pointer overflow-hidden transition-all duration-200"
         style={{
           background: "hsl(220,44%,7%)",
           borderColor: alert ? accent + "55" : "rgba(255,255,255,0.06)",
@@ -35,7 +46,6 @@ export function KpiCard({ label, value, icon: Icon, href, accent, glow, iconBg, 
           e.currentTarget.style.transform = "translateY(0)"
         }}
       >
-        {/* Top accent line */}
         <div style={{
           position: "absolute", top: 0, left: 0, right: 0, height: "2px",
           background: `linear-gradient(90deg, ${accent}, transparent)`,

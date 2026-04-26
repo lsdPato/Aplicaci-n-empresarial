@@ -12,7 +12,7 @@ import { ExpensesByMonthChart, ExpensesByCategoryChart } from "@/components/dash
 import { BudgetProgress } from "@/components/dashboard/budget-progress"
 import { ActivityFeed } from "@/components/dashboard/activity-feed"
 import { KpiCard } from "@/components/dashboard/kpi-card"
-import { FolderOpen, Receipt, Monitor, FileText, GitMerge, AlertTriangle, Clock, TrendingUp } from "lucide-react"
+import { FolderOpen, Receipt, AlertTriangle, Clock, TrendingUp } from "lucide-react"
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
@@ -145,27 +145,27 @@ export default async function DashboardPage() {
 
   const kpis = [
     {
-      label: "Proyectos activos", value: activeProjects, icon: FolderOpen,
+      label: "Proyectos activos", value: activeProjects, iconName: "folder-open",
       href: "/dashboard/projects",
       accent: "#2563eb", glow: "rgba(37,99,235,0.3)", iconBg: "rgba(37,99,235,0.15)",
     },
     {
-      label: "Gastos pendientes", value: pendingExpenses, icon: Receipt,
+      label: "Gastos pendientes", value: pendingExpenses, iconName: "receipt",
       href: "/dashboard/expenses", alert: pendingExpenses > 0,
       accent: "#d97706", glow: "rgba(217,119,6,0.3)", iconBg: "rgba(217,119,6,0.15)",
     },
     {
-      label: "Activos por vencer", value: assetsNearExpiry.length, icon: Monitor,
+      label: "Activos por vencer", value: assetsNearExpiry.length, iconName: "monitor",
       href: "/dashboard/assets", alert: assetsNearExpiry.length > 0,
       accent: "#ea580c", glow: "rgba(234,88,12,0.3)", iconBg: "rgba(234,88,12,0.15)",
     },
     {
-      label: "Contratos activos", value: activeContracts, icon: FileText,
+      label: "Contratos activos", value: activeContracts, iconName: "file-text",
       href: "/dashboard/contracts",
       accent: "#059669", glow: "rgba(5,150,105,0.3)", iconBg: "rgba(5,150,105,0.15)",
     },
     {
-      label: "Mis aprobaciones", value: myPendingSteps, icon: GitMerge,
+      label: "Mis aprobaciones", value: myPendingSteps, iconName: "git-merge",
       href: "/dashboard/approvals", alert: myPendingSteps > 0,
       accent: "#7c3aed", glow: "rgba(124,58,237,0.3)", iconBg: "rgba(124,58,237,0.15)",
     },
